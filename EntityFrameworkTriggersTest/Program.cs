@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 namespace EntityFrameworkTriggersTest;
 
@@ -16,6 +18,15 @@ public static class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
 
+        //Configure custom json options
+        builder.Services.ConfigureHttpJsonOptions(options => {
+            options.SerializerOptions.WriteIndented = true;
+            options.SerializerOptions.IncludeFields = true;
+            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; //best practice for JSON
+            options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; //stops cyclic references killing the app and gives better info
+        });
+
+        
         builder.Services.AddDbContext<BloggingContext>(options =>
             options.UseSqlServer("name=ConnectionStrings:BloggingDatabase"));
 
@@ -47,19 +58,21 @@ public static class Program
 
         app.UseAuthorization();
 
-        ConfigureMinimalApis(app);
+        AddBlogEndpoints(app);
+        AddPostEndpoints(app);
         
         app.Run();
     }
 
-    private static void ConfigureMinimalApis(WebApplication app)
+    private static void AddBlogEndpoints(WebApplication app)
     {
         app.MapGet("/blogs", async (BloggingContext db) =>
             await db.Blogs.ToListAsync())
             .WithOpenApi();
 
         app.MapGet("/blogs/{id}", async (int id, BloggingContext db) =>
-            await db.Blogs.FindAsync(id)
+            await db.Blogs.Include(b => b.Posts)
+                   .SingleOrDefaultAsync(b => b.BlogId == id)
                 is { } blog
                 ? Results.Ok(blog)
                 : Results.NotFound());
@@ -78,6 +91,37 @@ public static class Program
                 return Results.NotFound();
             
             db.Blogs.Remove(blog);
+            await db.SaveChangesAsync();
+            return Results.NoContent();
+        });
+    }
+    
+    private static void AddPostEndpoints(WebApplication app)
+    {
+        app.MapGet("/posts", async (BloggingContext db) =>
+                await db.Posts.ToListAsync())
+            .WithOpenApi();
+
+        app.MapGet("/posts/{id}", async (int id, BloggingContext db) =>
+            await db.Posts.FindAsync(id)
+                is { } post
+                ? Results.Ok(post)
+                : Results.NotFound());
+
+        app.MapPost("/posts", async (Post post, BloggingContext db) =>
+        {
+            db.Posts.Add(post);
+            await db.SaveChangesAsync();
+
+            return Results.Created($"/posts/{post.PostId}", post);
+        });
+
+        app.MapDelete("/posts/{id}", async (int id, BloggingContext db) =>
+        {
+            if (await db.Posts.FindAsync(id) is not { } post) 
+                return Results.NotFound();
+            
+            db.Posts.Remove(post);
             await db.SaveChangesAsync();
             return Results.NoContent();
         });

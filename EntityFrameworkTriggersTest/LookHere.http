@@ -8,6 +8,10 @@ Accept: application/json
 
 GET {{base}}/blogs
 
+### Get single Blog
+
+GET {{base}}/blogs/1
+
 ### Add new Blog
 
 POST {{base}}/blogs
@@ -16,5 +20,21 @@ Content-Type: application/json
 
 {
   "url": "www.{{$random.alphanumeric(15)}}.com"
+}
+
+### Get all Posts
+
+GET {{base}}/posts
+
+### Add new Post
+
+POST {{base}}/posts
+Accept: application/json
+Content-Type: application/json
+
+{
+  "title": "{{$random.alphanumeric(15)}}",
+  "content": "{{$random.alphanumeric(15)}} {{$random.alphanumeric(15)}} {{$random.alphanumeric(15)}} {{$random.alphanumeric(15)}} {{$random.alphanumeric(15)}} {{$random.alphanumeric(15)}}",
+  "blogId": 1
 }
 
