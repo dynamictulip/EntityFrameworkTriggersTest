@@ -4,6 +4,8 @@
     build:
       context: .
       dockerfile: EntityFrameworkTriggersTest/Dockerfile
+    environment:
+      - dbConnectionString=Server=sqlserver;Database=tulip;User Id=sa;Password=mySuperStrong_pa55word!!!;TrustServerCertificate=true;
     networks:
       - db-triggers-network
   sqlserver:

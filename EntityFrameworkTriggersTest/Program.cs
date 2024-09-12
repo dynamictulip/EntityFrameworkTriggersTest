@@ -1,9 +1,14 @@
 ﻿namespace EntityFrameworkTriggersTest;
 
-class Program
+internal class Program
 {
-    static void Main(string[] args)
+    private static void Main()
     {
-        Console.WriteLine("Hello, World!");
+        var dbConnectionString = Environment.GetEnvironmentVariable("dbConnectionString") ?? string.Empty;
+
+        Console.WriteLine("Super spike initiating");
+        Console.WriteLine($"DB connection string is \"{dbConnectionString}\"");
+        
+        
     }
 }
