@@ -1,7 +1,20 @@
 
-GET {{EntityFrameworkTriggersTest_HostAddress}}/health
+### Health check
+
+GET {{base}}/health
 Accept: application/json
 
-###
+### Get all Blogs
 
-GET {{EntityFrameworkTriggersTest_HostAddress}}/blogs
+GET {{base}}/blogs
+
+### Add new Blog
+
+POST {{base}}/blogs
+Accept: application/json
+Content-Type: application/json
+
+{
+  "url": "www.{{$random.alphanumeric(15)}}.com"
+}
+
