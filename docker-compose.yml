@@ -1,11 +1,13 @@
 ﻿services:
   entity-framework-triggers-test:
-    image: entity-framework-triggers-test
     build:
       context: .
       dockerfile: EntityFrameworkTriggersTest/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
     environment:
-      - dbConnectionString=Server=sqlserver;Database=tulip;User Id=sa;Password=mySuperStrong_pa55word!!!;TrustServerCertificate=true;
+      - ConnectionStrings__BloggingDatabase=Server=sqlserver;Database=tulip;User Id=sa;Password=mySuperStrong_pa55word!!!;TrustServerCertificate=true;
     networks:
       - db-triggers-network
   sqlserver:

@@ -1,0 +1,7 @@
+
+GET {{EntityFrameworkTriggersTest_HostAddress}}/health
+Accept: application/json
+
+###
+
+GET {{EntityFrameworkTriggersTest_HostAddress}}/blogs
