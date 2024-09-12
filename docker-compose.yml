@@ -1,8 +1,12 @@
 ﻿services:
   entity-framework-triggers-test:
+    depends_on:
+      sqlserver:
+        condition: service_healthy
     build:
       context: .
       dockerfile: EntityFrameworkTriggersTest/Dockerfile
+      no_cache: true
     ports:
       - "8080:8080"
       - "8081:8081"
