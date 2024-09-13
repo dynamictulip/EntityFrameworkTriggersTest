@@ -62,3 +62,39 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240912234001_AuditTable'
+)
+BEGIN
+    CREATE TABLE [AuditEvents] (
+        [Id] uniqueidentifier NOT NULL,
+        [TableName] nvarchar(max) NOT NULL,
+        [PrimaryKeyColumnName] nvarchar(max) NOT NULL,
+        [PrimaryKeyType] nvarchar(max) NOT NULL,
+        [PrimaryKeyValueAsJson] nvarchar(max) NOT NULL,
+        [EntityOperationType] int NOT NULL,
+        [AlteredColumnName] nvarchar(max) NOT NULL,
+        [AlteredColumnType] nvarchar(max) NOT NULL,
+        [AuditMessage] nvarchar(max) NULL,
+        CONSTRAINT [PK_AuditEvents] PRIMARY KEY ([Id])
+    );
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20240912234001_AuditTable'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20240912234001_AuditTable', N'8.0.8');
+END;
+GO
+
+COMMIT;
+GO
+
